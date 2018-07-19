@@ -6,7 +6,24 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+//optionActors in-memory to store registered xlator type and OptionActor
 var optionActors = make(map[string]OptionActor)
+
+//GetOptActors returns unexported optionActors
+func GetOptActors() map[string]OptionActor {
+	return optionActors
+}
+
+//VolumeOpType type associated with volume operation
+type VolumeOpType uint8
+
+//constants definded to represent volume operation types
+const (
+	VolumeSet VolumeOpType = iota
+	VolumeReset
+	VolumeStart
+	VolumeStop
+)
 
 // OptionActor is an interface that contains Do and Undo methods. These methods
 // are invoked during volume set on ALL nodes that make up the volume.
@@ -14,11 +31,11 @@ var optionActors = make(map[string]OptionActor)
 // have the xlator/feature specific logic executed during volume set. An example
 // of such logic is the task of starting and stopping daemon.
 type OptionActor interface {
-	// Do function takes volinfo, option key, option value, logger.
-	Do(*volume.Volinfo, string, string, log.FieldLogger) error
-	// Undo function takes volinfo, option key, option value and logger. The returned
+	// Do function takes volinfo, option key, option value,VolumeOpType, logger.
+	Do(*volume.Volinfo, string, string, VolumeOpType, log.FieldLogger) error
+	// Undo function takes volinfo, option key, option value,VolumeOpType, logger. The returned
 	// error is currently ignored.
-	Undo(*volume.Volinfo, string, string, log.FieldLogger) error
+	Undo(*volume.Volinfo, string, string, VolumeOpType, log.FieldLogger) error
 }
 
 // RegisterOptionActor registers a xlator's type implementing OptionActor
