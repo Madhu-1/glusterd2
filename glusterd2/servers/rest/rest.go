@@ -85,6 +85,8 @@ func NewMuxed(m cmux.CMux) *GDRest {
 
 	rest.registerRoutes()
 
+	//Enable profiling
+	EnableProfiling(rest.Routes)
 	// Set Handler to opencensus HTTP handler to enable tracing
 	// Set chain of ordered middlewares
 	rest.server.Handler = &ochttp.Handler{
